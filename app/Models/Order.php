@@ -16,6 +16,13 @@ class Order extends Model
         return $this->belongsTo(User::class, 'purchaser_id');
     }
 
+
+    public function distributor()
+    {
+        # code...
+        return $this->belongsTo(User::class, 'referred_by');
+    }
+
     public function items()
     {
         # code...

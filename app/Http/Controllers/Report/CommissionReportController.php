@@ -51,10 +51,10 @@ class CommissionReportController extends Controller
 
     public function commissionReportFilter(Request $request)
     {
-
         $noOfRecords = 10;
         $from = $request->from;
         $to = $request->to;
+        $user_id = $request->user_id;
         $query = Order::select('orders.*')
             ->join('users', 'users.id', '=', 'orders.purchaser_id');
 
@@ -64,11 +64,13 @@ class CommissionReportController extends Controller
         if ($to) {
             $query = $query->whereDate('orders.order_date', '<=', $to);
         }
+        if ($user_id) {
+            $query = $query->where('users.id', $user_id);
+        }
         $query = $query->orderBy('orders.id', 'desc')
             ->paginate($noOfRecords);
 
         $queryData = [];
-
         $i = $query->perPage() * ($query->currentPage() - 1);
         foreach ($query as $singleData) {
             $i++;
@@ -77,11 +79,12 @@ class CommissionReportController extends Controller
                 'invoice' => $singleData->invoice_number,
                 'purchaser' => $singleData->purchaser->first_name . ' ' . $singleData->purchaser->last_name,
                 'distributor' => User::getReferralName($singleData->id),
-                'referred_distributor' => User::getNumberOfDistributor($singleData->id),
+                'referred_distributor' => User::getNumberOfReferredDistributor($singleData->id),
                 'order_date' => $singleData->order_date,
                 'order_total' => number_format(OrderItem::orderItemsTotal($singleData->id), 2),
-                'percentage' => User::getcommissionPercentage($singleData->id, User::getNumberOfDistributor($singleData->id)) . '%',
-                'commission'  => number_format(getCommission(OrderItem::orderItemsTotal($singleData->id), User::getcommissionPercentage($singleData->id, User::getNumberOfDistributor($singleData->id))), 2)
+                'percentage' => User::getcommissionPercentage($singleData->id, User::getNumberOfReferredDistributor($singleData->id)) . '%',
+                'commission'  => number_format(getCommission(OrderItem::orderItemsTotal($singleData->id), User::getcommissionPercentage($singleData->id, User::getNumberOfReferredDistributor($singleData->id))), 2)
+
             );
         }
 
@@ -89,12 +92,9 @@ class CommissionReportController extends Controller
             'success' => true,
             'totalRecords' => $query->total(),
             'data' => $queryData,
-            // 'logPagination' => str_replace("\r\n", "", $query->links('layouts.pagination')),
+            'pagination' => str_replace("\r\n", "", $query->links('commission.pagination')),
             'count' => $query->count()
         ];
-
-        // logger($response);
-
         return $response;
     }
 }

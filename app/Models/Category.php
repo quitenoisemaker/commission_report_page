@@ -8,4 +8,9 @@ class Category extends Model
 {
     //
 
+    //category name 
+    public function scopeCategoryName($query, $id)
+    {
+        return $query->find($id)->name;
+    }
 }

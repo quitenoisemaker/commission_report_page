@@ -4,6 +4,7 @@ namespace App;
 
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\UserCategory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -40,27 +41,27 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function referredDistributors($user_id, $order_date)
+    public function userCategory()
     {
-        # code...
-        return $this->where('referred_by', $user_id)->whereDate('enrolled_date', '<=', $order_date)->count();
+        return $this->hasOne(UserCategory::class, 'user_id');
     }
 
     public static function getReferralName($order_id)
     {
-        # code...
+
         $purchaser = Order::where('id', $order_id)->first()->purchaser_id;
         $referral = self::where('id', $purchaser)->first()->referred_by;
 
         $getUserCategoryName = UserCategory::getUserCategory($referral);
 
-        if ($getUserCategoryName === 'Distributor') {
-            # code...
+        if ($getUserCategoryName === Category::categoryName(1)) {
+            # if user is a distributor 
 
             $distributorName = self::where('id', $referral)->first();
 
+            # check if user has a name
             if (empty($distributorName)) {
-                # code...
+
                 return null;
             } else {
                 $distributorFullName = $distributorName->first_name . ' ' . $distributorName->last_name;
@@ -71,9 +72,8 @@ class User extends Authenticatable
         return null;
     }
 
-    public static function getNumberOfDistributor($order_id)
+    public static function getNumberOfReferredDistributor($order_id)
     {
-        # code...
         $count = 0;
         $getOrder = Order::where('id', $order_id)->first();
         $getPurchaserId = $getOrder->purchaser_id;
@@ -82,8 +82,8 @@ class User extends Authenticatable
 
         $getreferralCategoryName = UserCategory::getUserCategory($referralId);
 
-        if ($getreferralCategoryName === 'Distributor') {
-            # code...
+        if ($getreferralCategoryName === Category::categoryName(1)) {
+            # count number of referree  
             $count = self::where('referred_by', '=', $referralId)
                 ->where('enrolled_date', '<', $getOrder->order_date)
                 ->count();
@@ -101,19 +101,14 @@ class User extends Authenticatable
 
         if ($getreferralCategoryName === 'Customer') {
             if ((0 <= $value) && ($value <= 4)) {
-                # code...
                 return $commission = 5;
             } elseif ((5 <= $value) && ($value <= 10)) {
-                # code...
                 return $commission = 10;
             } elseif ((11 <= $value) && ($value <= 20)) {
-                # code...
                 return $commission = 15;
             } elseif ((21 <= $value) && ($value <= 30)) {
-                # code...
                 return $commission = 20;
             } elseif ((31 <= $value) || ($value > 31)) {
-                # code...
                 return $commission = 30;
             }
             return $commission;

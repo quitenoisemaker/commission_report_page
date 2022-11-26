@@ -30,19 +30,8 @@ Route::get('/rank/report', 'Report\RankReportController@index')->name('rank.repo
 Route::get('/items/viewData/{id}', 'Report\CommissionReportController@getViewItemsModal');
 Route::any('/commision/report/filter', 'Report\CommissionReportController@commissionReportFilter')->name('commission.report.filter');
 //Route::get('/commision/report/filter', 'Report\CommissionReportController@commissionReportFilter')->name('commission.report.filter');
+
 Route::get('/test', function () {
 
-
-    return OrderItem::orderItemsTotal(220902);
-    // return User::getcommissionPercentage(
-    //     238580,
-    //     User::getNumberOfDistributor(
-    //         238580
-
-    //     )
-    // );
+    return getDistributor();
 });
-// Route::get('/test', function (Order $userOrder) {
-//     $userOrder = $userOrder->get();
-//     return $userOrder->user->referredDistributors($userOrder->user->referred_by, $userOrder->order_date);
-// });
