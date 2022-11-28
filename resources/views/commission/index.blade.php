@@ -21,14 +21,14 @@
                             {{ method_field('POST') }}
                             <div class="form-row align-items-center">
                                 <div class="form-group col-md-12">
-                                    <select name="user_id" id="user_filter" class="form-control" onfocus='this.size=5;' onblur='this.size=1;' onchange='this.size=1; this.blur();'>
+                                    <select name="user_id" id="user_filter" class="form-control">
                                         <option value="" selected disabled>Search users</option>
                                         @if (count(getDistributor())>0)
-                                            @foreach(getDistributor() as $user)
-                                                <option value={{$user['user_id']}}>{{$user['name']}}</option>
-                                            @endforeach
-                                        @endif
-                                    </select>
+                                        @foreach(getDistributor() as $user)
+                                            <option value={{$user->id}}>{{$user->first_name.' '.$user->first_name}}</option>
+                                        @endforeach
+                                    @endif
+                                      </select>
                                 </div>
 
                                 <div class="col-5">
@@ -161,6 +161,12 @@
             $("#modal-global").find('.modal-body').html(htmlCode);                                
         })
     });   
+
+    $(document).ready(function () {
+      $('select').selectize({
+          sortField: 'text'
+      });
+  });
 </script>
 
 {{-- script file --}}

@@ -1,6 +1,7 @@
 <?php
 
 use App\User;
+use App\Models\Category;
 use App\Models\UserCategory;
 
 function getCommission($orderTotal, $percentageValue)
@@ -11,16 +12,9 @@ function getCommission($orderTotal, $percentageValue)
 
 function getDistributor()
 {
-    $getDistributorDetails = [];
-    $users =  User::select('id', 'first_name', 'last_name')
-        ->cursor();
+    $distributors = User::select('id', 'first_name', 'last_name')->whereHas('userCategory', function ($query) {
+        $query->where('user_category.category_id', 1);
+    })->cursor();
 
-    foreach ($users as $value) {
-        # code...
-        $getDistributorDetails[] = [
-            'user_id' => $value->id,
-            'name' => $value->first_name . ' ' . $value->last_name,
-        ];
-    }
-    return $getDistributorDetails;
+    return $distributors;
 }

@@ -50,21 +50,21 @@ class User extends Authenticatable
     {
 
         $purchaser = Order::where('id', $order_id)->first()->purchaser_id;
-        $referral = self::select('first_name', 'last_name', 'referred_by')->where('id', $purchaser)->first();
+        $referral = self::where('id', $purchaser)->first()->referred_by;
 
-        $getUserCategoryName = UserCategory::getUserCategory($referral->referred_by);
+        $getUserCategoryName = UserCategory::getUserCategory($referral);
 
         if ($getUserCategoryName === Category::categoryName(1)) {
             # if user is a distributor 
 
-            $distributorName = $referral->referred_by;
+            $distributorName = self::where('id', $referral)->first();
 
             # check if user has a name
             if (empty($distributorName)) {
 
                 return null;
             } else {
-                $distributorFullName = $referral->first_name . ' ' . $referral->last_name;
+                $distributorFullName = $distributorName->first_name . ' ' . $distributorName->last_name;
             }
 
             return $distributorFullName;

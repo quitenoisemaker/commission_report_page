@@ -58,6 +58,7 @@ class CommissionReportController extends Controller
         $query = Order::select('orders.*')
             ->join('users', 'users.id', '=', 'orders.purchaser_id');
 
+
         if ($from) {
             $query = $query->whereDate('orders.order_date', '>=', $from);
         }
