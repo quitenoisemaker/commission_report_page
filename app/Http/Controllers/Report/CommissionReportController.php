@@ -56,9 +56,8 @@ class CommissionReportController extends Controller
         $to = $request->to;
         $user_id = $request->user_id;
         $query = Order::select('orders.*')
-            ->join('users', 'users.id', '=', 'orders.purchaser_id');
-
-
+            ->join('users', 'users.id', '=', 'orders.purchaser_id')
+            ->join('user_category', 'user_category.user_id', '=', 'users.id');
         if ($from) {
             $query = $query->whereDate('orders.order_date', '>=', $from);
         }
@@ -66,7 +65,8 @@ class CommissionReportController extends Controller
             $query = $query->whereDate('orders.order_date', '<=', $to);
         }
         if ($user_id) {
-            $query = $query->where('users.id', $user_id);
+            $query->where('user_category.category_id', 1)
+                ->where('users.referred_by', $user_id);
         }
         $query = $query->orderBy('orders.id', 'desc')
             ->paginate($noOfRecords);
