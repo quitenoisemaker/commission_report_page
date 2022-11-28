@@ -41,26 +41,6 @@ class OrderItem extends Model
 
     public static function orderItemsTotalByDistributor()
     {
-        # code...
-        // $users = User::query()
-        //     ->cursor() //for collection lazy loading
-        //     ->each(function (User $value) {
-        //         $getUserCategoryName = UserCategory::getUserCategory($value->referred_by);
-
-        //         if ($getUserCategoryName === 'Distributor') {
-        //             # code...
-
-        //             $distributorName = User::where('id', $value->referred_by)->first();
-
-        //             if (!empty($distributorName)) {
-        //                 # code...
-        //                 $getDistributorDetails[] = [
-        //                     'user_id' => $distributorName->id,
-        //                 ];
-        //             }
-        //         }
-        //     });
-
         $users = User::select('referred_by')->cursor();
 
         return $users->pluck('referred_by');

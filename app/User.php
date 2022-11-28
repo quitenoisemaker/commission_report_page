@@ -50,21 +50,21 @@ class User extends Authenticatable
     {
 
         $purchaser = Order::where('id', $order_id)->first()->purchaser_id;
-        $referral = self::where('id', $purchaser)->first()->referred_by;
+        $referral = self::select('first_name', 'last_name', 'referred_by')->where('id', $purchaser)->first();
 
-        $getUserCategoryName = UserCategory::getUserCategory($referral);
+        $getUserCategoryName = UserCategory::getUserCategory($referral->referred_by);
 
         if ($getUserCategoryName === Category::categoryName(1)) {
             # if user is a distributor 
 
-            $distributorName = self::where('id', $referral)->first();
+            $distributorName = $referral->referred_by;
 
             # check if user has a name
             if (empty($distributorName)) {
 
                 return null;
             } else {
-                $distributorFullName = $distributorName->first_name . ' ' . $distributorName->last_name;
+                $distributorFullName = $referral->first_name . ' ' . $referral->last_name;
             }
 
             return $distributorFullName;
@@ -75,7 +75,7 @@ class User extends Authenticatable
     public static function getNumberOfReferredDistributor($order_id)
     {
         $count = 0;
-        $getOrder = Order::where('id', $order_id)->first();
+        $getOrder = Order::select('purchaser_id', 'order_date')->where('id', $order_id)->first();
         $getPurchaserId = $getOrder->purchaser_id;
         $getPurchaser = self::where('id', $getPurchaserId)->first();
         $referralId = $getPurchaser->referred_by;
